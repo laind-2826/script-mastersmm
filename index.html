@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mastersmm.net</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+    <div id="app" class="container pt-3">
+        <h1><a class="contrast" href="https://mastersmm.net" target="_blank">Mastersmm.net</a>🕵️‍♂️</h1>
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-3">
+                    <label class="form-label">Token</label>
+                    <el-input placeholder="Nhập token mastersmm.net" v-model="token" @change="getServices()"></el-input>
+                </div>
+                <div class="mb-3"></div>
+                    <label class="form-label">Services</label>
+                    <el-select class="w-100" v-model="service" filterable placeholder="Select">
+                        <el-option
+                            v-for="item in services"
+                            :key="item.id"
+                            :label="`${item.name} - ${item.price} VND`"
+                            :value="item.id">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div class="mb-3"></div>
+                    <label class="form-label">UID</label>
+                    <el-input
+                        type="textarea"
+                        :rows="5"
+                        placeholder="Nhập UID định dạng 100095225132045|100094639584788"
+                        v-model="uid">
+                    </el-input>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Số lượng</label>
+                    <el-input placeholder="Số lượng" v-model="quantity"></el-input>
+                </div>
+                <div class="mb-3 mt-3">
+                    <el-button class="w-100" type="primary" :disabled="isDisable" @click="byService()">Mua</el-button>
+                </div>
+
+                <h5>UID mua thành công</h5>
+                <el-table
+                    :data="uidBuySuccess"
+                    style="width: 100%">
+                    <el-table-column
+                        prop="order_id"
+                        label="Order ID">
+                    </el-table-column>
+                    <el-table-column
+                        prop="uid"
+                        label="UID">
+                    </el-table-column>
+                    
+                </el-table>
+                <h5 class="mt-4">UID mua thất bại</h5>
+                <el-table
+                    :data="uidBuyError"
+                    style="width: 100%">
+                    <el-table-column
+                        prop="uid"
+                        label="UID">
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js" integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+         new Vue({
+            el: '#app',
+            data: function() {
+                return { 
+                    token: '',
+                    url: 'https://mastersmm.net/api/v2',
+                    services: [],
+                    service: null,
+                    uid: '',
+                    uidBuySuccess: [],
+                    uidBuyError: [],
+                    quantity: 100,
+                    isDisable: false
+                }
+            },
+            methods: {
+                async getServices() {
+                    try {
+                        const params = {
+                            action: 'services',
+                            key: this.token
+                        }
+
+                        const res = await axios.post(this.url, params)
+                        let data = res.data.data
+                        this.services = data.filter(item => item.status === "Active");
+                        this.$notify({
+                            title: 'Success',
+                            message: 'Lấy danh sách dịch vụ thành công',
+                            type: 'success'
+                        });
+                    } catch (error) {
+                        this.$notify.error({
+                            title: 'Error',
+                            message: 'Token không hợp lệ '
+                        });
+                    }
+                },
+                async byService() {
+                    try {
+                        if (this.uid.length == 0 || !this.service || !this.token) {
+                            this.$notify.error({
+                                title: 'Error',
+                                message: 'Vui lòng điền đầy đủ thông tin'
+                            });
+
+                            return
+                        }
+                        this.isDisable = true
+                        let uidArr = this.uid.trim().split('|');
+                        console.log('avc', uidArr);
+
+                        for (const item of uidArr) {
+                            await this.getUidPublic(item.trim());
+                        }
+                        this.isDisable = false
+                    } catch (error) {
+                        console.log(error);
+                        this.isDisable = false
+                        this.$notify.error({
+                            title: 'Error',
+                            message: 'Token không hợp lệ '
+                        });
+                    }
+                },
+                async getUidPublic(uid) {
+                    try {
+                        const params = {
+                            link: `https://www.facebook.com/people/abc/${uid}`
+                        }
+                        const res = await axios.post('https://mastersmm.net/api/tool/get-uid', params)
+                        if (res.data.status === 'success') {
+                            await this.createOrder(res.data.uid, uid);
+                        } else {
+                            this.uidBuyError.push({uid: uidPrivate})
+                        }
+                    } catch (error) {
+                        
+                    }
+                },
+                async createOrder(uidPublic, uidPrivate) {
+                    try {
+                        const params = {
+                            action: 'add',
+                            key: this.token,
+                            link: uidPublic,
+                            quantity: this.quantity,
+                            service: this.service,
+                        }
+
+                        const res = await axios.post(this.url, params)
+                        console.log(res)
+                        if (res.data.status === 'success') {
+                            this.uidBuySuccess.push({uid: uidPrivate, order_id: res.data.order_id})
+                        } else {
+                            this.uidBuyError.push({uid: uidPrivate})
+                        }
+                    } catch (error) {
+                        this.uidBuyError.push({uid: uidPrivate})
+                    }
+                }
+            },
+            async mounted () {
+                // await this.getServices()
+            },
+        });
+    </script>
+</body>
+</html>
