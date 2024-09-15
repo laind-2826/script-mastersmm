@@ -10,6 +10,7 @@
 <body>
     <div id="app" class="container pt-3">
         <h1><a class="contrast" href="https://mastersmm.net" target="_blank">Mastersmm.net</a>🕵️‍♂️</h1>
+        <span>Script hỗ trợ mua số lượng lớn với 1 lần click</span>
         <div class="row">
             <div class="col-12">
                 <div class="mb-3">
@@ -18,11 +19,11 @@
                 </div>
                 <div class="mb-3"></div>
                     <label class="form-label">Services</label>
-                    <el-select class="w-100" v-model="service" filterable placeholder="Select">
+                    <el-select class="w-100" v-model="service" filterable placeholder="Select" popper-append-to-body="false">
                         <el-option
                             v-for="item in services"
                             :key="item.id"
-                            :label="`${item.name} - ${item.price} VND`"
+                            :label="`${item.id} - ${item.name} - ${item.price} VND`"
                             :value="item.id">
                         </el-option>
                     </el-select>
@@ -41,7 +42,7 @@
                     <el-input placeholder="Số lượng" v-model="quantity"></el-input>
                 </div>
                 <div class="mb-3 mt-3">
-                    <el-button class="w-100" type="primary" :disabled="isDisable" @click="byService()">Mua</el-button>
+                    <el-button class="w-100" type="primary" :disabled="isDisable" @click="buyService()">Mua</el-button>
                 </div>
 
                 <h5>UID mua thành công</h5>
@@ -116,8 +117,9 @@
                         });
                     }
                 },
-                async byService() {
+                async buyService() {
                     try {
+                        this.uidBuySuccess = this.uidBuyError = [];
                         if (this.uid.length == 0 || !this.service || !this.token) {
                             this.$notify.error({
                                 title: 'Error',
