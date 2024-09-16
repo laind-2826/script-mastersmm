@@ -3,10 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mastersmm.net</title>
+    <title>MASTERSMM.NET | Top Social Media Marketing Service | Affordable &amp; Fast Results</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <meta name="description" content="Công cụ giúp mua nhiều đơn hàng cùng một lúc tại website mastersmm.net">
+
+    <meta property="og:title" content="Script mastersmm.net">
+    <meta property="og:description" content="Công cụ giúp mua nhiều đơn hàng cùng một lúc tại website mastersmm.net">
+    <meta property="og:image" content="https://i.imgur.com/MqDS59g.jpeg">
+    <meta property="og:url" content="https://script.mastersmm.net/">
+    <meta property="og:site_name" content="mastersmm.net">
+    <meta property="og:type" content="website">
 </head>
+<style>
+    .uid-error {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+    }
+</style>
 <body>
     <div id="app" class="container pt-3">
         <h1><a class="contrast" href="https://mastersmm.net" target="_blank">Mastersmm.net</a>🕵️‍♂️</h1>
@@ -19,7 +34,7 @@
                 </div>
                 <div class="mb-3"></div>
                     <label class="form-label">Services</label>
-                    <el-select class="w-100" v-model="service" filterable placeholder="Select" popper-append-to-body="false">
+                    <el-select class="w-100" v-model="service" filterable placeholder="Select">
                         <el-option
                             v-for="item in services"
                             :key="item.id"
@@ -59,7 +74,10 @@
                     </el-table-column>
                     
                 </el-table>
-                <h5 class="mt-4">UID mua thất bại</h5>
+                <div class="uid-error">
+                    <h5 class="mt-4">UID mua thất bại</h5>
+                    <el-button style="margin: auto 0;" type="primary" @click="copyUidClipBoard()">Copy UID</el-button>
+                </div>
                 <el-table
                     :data="uidBuyError"
                     style="width: 100%">
@@ -74,7 +92,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue@2/dist/vue.min.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js" integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -180,7 +198,25 @@
                     } catch (error) {
                         this.uidBuyError.push({uid: uidPrivate})
                     }
-                }
+                },
+                copyUidClipBoard(isUidFail = true) {
+                    let data = JSON.parse(JSON.stringify(this.uidBuyError));
+                    let stringCopy = data.map(item => item.uid).filter(uid => uid).join('|');
+                    console.log(stringCopy);
+
+                    navigator.clipboard.writeText(stringCopy).then(() => {
+                        this.$notify({
+                            title: 'Success',
+                            message: 'Copy thành công',
+                            type: 'success'
+                        });
+                    }).catch(err => {
+                        this.$notify.error({
+                            title: 'Error',
+                            message: 'Copy thất bại'
+                        });
+                    });
+                },
             },
             async mounted () {
                 // await this.getServices()
