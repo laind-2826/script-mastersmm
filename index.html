@@ -183,13 +183,12 @@
                         const params = {
                             action: 'add',
                             key: this.token,
-                            link: `https://www.facebook.com/profile.php?id=${uidPublic}`,
+                            link: uidPublic,
                             quantity: this.quantity,
                             service: this.service,
                         }
 
                         const res = await axios.post(this.url, params)
-                        console.log(res)
                         if (res.data.status === 'success') {
                             this.uidBuySuccess.push({uid: uidPrivate, order_id: res.data.order_id})
                         } else {
