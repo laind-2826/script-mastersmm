@@ -37,9 +37,9 @@
                     <el-select class="w-100" v-model="service" filterable placeholder="Select">
                         <el-option
                             v-for="item in services"
-                            :key="item.id"
-                            :label="`${item.id} - ${item.name} - ${item.price} VND`"
-                            :value="item.id">
+                            :key="item.service"
+                            :label="`${item.service} - ${item.name} - ${item.rate}$ per 1000`"
+                            :value="item.service">
                         </el-option>
                     </el-select>
                 </div>
@@ -85,6 +85,10 @@
                         prop="uid"
                         label="UID">
                     </el-table-column>
+                    <el-table-column
+                    prop="note"
+                    label="Lý do">
+                </el-table-column>
                 </el-table>
             </div>
         </div>
@@ -101,7 +105,7 @@
             el: '#app',
             data: function() {
                 return { 
-                    token: '',
+                    token: '41|s6QELlCWiWyzivDB5RqFbptlIe6JfYSxWr4YiILS',
                     url: 'https://mastersmm.net/api/v2',
                     services: [],
                     service: null,
@@ -121,7 +125,7 @@
                         }
 
                         const res = await axios.post(this.url, params)
-                        let data = res.data.data
+                        let data = res.data
                         this.services = data.filter(item => item.status === "Active");
                         this.$notify({
                             title: 'Success',
@@ -151,6 +155,7 @@
                         console.log('avc', uidArr);
 
                         for (const item of uidArr) {
+                            console.log('abc')
                             await this.getUidPublic(item.trim());
                         }
                         this.isDisable = false
@@ -166,13 +171,15 @@
                 async getUidPublic(uid) {
                     try {
                         const params = {
-                            link: `https://www.facebook.com/people/abc/${uid}`
+                            username: `people/abc/${uid}`
                         }
-                        const res = await axios.post('https://mastersmm.net/api/tool/get-uid', params)
-                        if (res.data.status === 'success') {
-                            await this.createOrder(res.data.uid, uid);
+                        const res = await axios.post('https://mastersmm.net/api/tool/get-uid-v2', params)
+                        console.log(res)
+                        if (res.data.status === 1) {
+                            console.log('abcdđ')
+                            return await this.createOrder(res.data.data.id, uid);
                         } else {
-                            this.uidBuyError.push({uid: uidPrivate})
+                            return this.uidBuyError.push({uid: uidPrivate})
                         }
                     } catch (error) {
                         
@@ -189,13 +196,11 @@
                         }
 
                         const res = await axios.post(this.url, params)
-                        if (res.data.status === 'success') {
-                            this.uidBuySuccess.push({uid: uidPrivate, order_id: res.data.order_id})
-                        } else {
-                            this.uidBuyError.push({uid: uidPrivate})
+                        if (res.data.order) {
+                            return this.uidBuySuccess.push({uid: uidPrivate, order_id: res.data.order})
                         }
                     } catch (error) {
-                        this.uidBuyError.push({uid: uidPrivate})
+                        return this.uidBuyError.push({uid: uidPrivate})
                     }
                 },
                 copyUidClipBoard(isUidFail = true) {
@@ -218,7 +223,7 @@
                 },
             },
             async mounted () {
-                // await this.getServices()
+                await this.getServices()
             },
         });
     </script>
