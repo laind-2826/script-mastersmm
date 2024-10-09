@@ -171,15 +171,13 @@
                 async getUidPublic(uid) {
                     try {
                         const params = {
-                            username: `people/abc/${uid}`
+                            link: `https://www.facebook.com/people/abc/${uid}`
                         }
-                        const res = await axios.post('https://mastersmm.net/api/tool/get-uid-v2', params)
-                        console.log(res)
-                        if (res.data.status === 1) {
-                            console.log('abcdđ')
-                            return await this.createOrder(res.data.data.id, uid);
+                        const res = await axios.post('https://mastersmm.net/api/tool/get-uid', params)
+                        if (res.data.status === 'success') {
+                            await this.createOrder(res.data.uid, uid);
                         } else {
-                            return this.uidBuyError.push({uid: uidPrivate})
+                            this.uidBuyError.push({uid: uidPrivate})
                         }
                     } catch (error) {
                         
