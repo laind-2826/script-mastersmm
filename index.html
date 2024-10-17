@@ -152,7 +152,6 @@
                         }
                         this.isDisable = true
                         let uidArr = this.uid.trim().split('|');
-                        console.log('avc', uidArr);
 
                         for (const item of uidArr) {
                             console.log('abc')
@@ -188,7 +187,7 @@
                         const params = {
                             action: 'add',
                             key: this.token,
-                            link: uidPublic,
+                            link: `https://www.facebook.com/profile.php?id=${uidPublic}`,
                             quantity: this.quantity,
                             service: this.service,
                         }
